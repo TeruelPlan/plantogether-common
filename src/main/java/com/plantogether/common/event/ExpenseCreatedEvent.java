@@ -9,7 +9,10 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExpenseCreatedEvent {
     private UUID expenseId;
     private UUID tripId;

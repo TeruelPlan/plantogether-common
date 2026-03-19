@@ -6,7 +6,8 @@ import lombok.Data;
 
 import java.time.Instant;
 
-@Data @Builder
+@Data
+@Builder
 public class ErrorResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Instant timestamp;
