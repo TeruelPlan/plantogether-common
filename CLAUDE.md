@@ -1,12 +1,14 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude when working with code in this repository.
 
 ## Overview
 
-`plantogether-common` is a shared Maven library (`com.plantogether:plantogether-common:1.0.0-SNAPSHOT`) consumed as a dependency by all PlanTogether microservices. It contains no runnable application — only shared classes published to the local Maven repository.
+`plantogether-common` is a shared Maven library (`com.plantogether:plantogether-common:1.0.0-SNAPSHOT`) consumed as a
+dependency by all PlanTogether microservices. It contains no runnable application — only shared classes published to the
+local Maven repository.
 
-**Stack:** Java 21, Spring Boot 3.3.6 BOM (for dependency management only), Lombok, Jackson (with `jackson-datatype-jsr310`).
+**Stack:** Java 21, Spring Boot 3.3.6 BOM (dependency management only), Lombok, Jackson (`jackson-datatype-jsr310`).
 
 ## Commands
 
@@ -29,23 +31,57 @@ mvn clean install -DskipTests
 The library is structured around four packages under `com.plantogether.common`:
 
 ### `event`
-RabbitMQ event DTOs for async inter-service communication. All classes use `UUID` for entity IDs and `Instant` for timestamps.
 
-`TripEvent` is a marker interface with Jackson polymorphic deserialization (`@JsonTypeInfo` / `@JsonSubTypes`). Events implementing it (e.g., `TripCreatedEvent`, `TripDeletedEvent`, `MemberJoinedEvent`) carry a `"type"` field in JSON. `ExpenseCreatedEvent` does **not** implement `TripEvent` — it's a standalone event.
+RabbitMQ event DTOs for async inter-service communication. All events follow the standard envelope format with
+`eventId` (UUID v7), `eventType`, `timestamp` (Instant), `source`, `tripId`, `userId`, and a typed `payload`.
+
+All classes use `UUID` for entity IDs and `Instant` for timestamps.
+
+**Implemented events:**
+- `TripCreatedEvent` — published by trip-service on `plantogether.events` exchange, routing key `trip.created`
+- `TripDeletedEvent` — published by trip-service, routing key `trip.deleted`
+- `MemberJoinedEvent` — published by trip-service, routing key `trip.member.joined`
+- `ExpenseCreatedEvent` — published by expense-service, routing key `expense.created`
+
+**Events to implement (per DTA v2.9):**
+- `PollCreatedEvent` — routing key `poll.created` (poll-service)
+- `PollLockedEvent` — routing key `poll.locked` (poll-service → notification-service + trip-service)
+- `VoteCastEvent` — routing key `vote.cast` (destination-service)
+- `ExpenseDeletedEvent` — routing key `expense.deleted` (expense-service)
+- `TaskAssignedEvent` — routing key `task.assigned` (task-service)
+- `TaskDeadlineReminderEvent` — routing key `task.deadline.reminder` (task-service scheduler)
+- `ChatMessageSentEvent` — routing key `chat.message.sent` (chat-service)
+- `UserProfileUpdatedEvent` — routing key `user.profile.updated` (keycloak-spi → trip-service)
+- `UserDeletedEvent` — routing key `user.deleted` (keycloak-spi → trip-service)
+
+All events use Exchange `plantogether.events` (Topic Exchange).
+
+`TripEvent` is a marker interface with Jackson polymorphic deserialization (`@JsonTypeInfo` / `@JsonSubTypes`).
 
 ### `exception`
-- `ResourceNotFoundException` — extends `RuntimeException`, used for 404s. Two constructors: `(String message)` and `(String resource, Object id)`.
+
+- `ResourceNotFoundException` — extends `RuntimeException`, used for 404s. Constructors: `(String message)` and
+  `(String resource, Object id)`.
 - `AccessDeniedException` — for 403s.
-- `ErrorResponse` — Lombok `@Builder` DTO for structured error responses (status, error, message, path, Instant timestamp).
+- `ErrorResponse` — Lombok `@Builder` DTO for structured error responses: `status`, `error`, `message`, `path`,
+  `Instant timestamp`. Aligns with RFC 9457 ProblemDetail convention used across all services.
 
 ### `security`
-`SecurityConstants` — constants for Keycloak JWT claims (`sub`, `email`, `given_name`, `family_name`, `preferred_username`, `realm_access.roles`).
+
+`SecurityConstants` — constants for Keycloak JWT claims: `sub`, `email`, `given_name`, `family_name`,
+`preferred_username`, `realm_access.roles`.
+
+### `config` (to add)
+
+Per DTA v2.9, shared configuration beans to be factorised here:
+- `CorsConfig` — CORS policy shared by all services (origins: `https://app.plantogether.com`, `http://localhost:*`)
+- Rate limiting configuration via Bucket4j + Redis (global: 100 req/min per userId)
 
 ## Key Conventions
 
-- User identity is always referenced by **Keycloak ID** (field names like `organizerKeycloakId`, `paidByKeycloakId`, `keycloakId`) — never by internal DB IDs.
-- All entity IDs are `UUID`, not `Long`.
-- All timestamps are `java.time.Instant`, not `LocalDateTime`.
+- User identity is always referenced by **Keycloak UUID** (field names like `organizerKeycloakId`,
+  `paidByKeycloakId`, `keycloakId`) — never by internal DB IDs.
+- All entity IDs are `UUID` (prefer UUID v7 for chronological ordering).
+- All timestamps are `java.time.Instant`, never `LocalDateTime`.
 - All event/DTO classes use Lombok `@Data @Builder @NoArgsConstructor @AllArgsConstructor`.
-
-> **Note:** The README.md describes a broader planned API (DTOs, `ApiResponse`, `PageResponse`, additional security utilities) that does not yet exist in the codebase. The actual implemented classes are limited to the `event`, `exception`, and `security` packages above.
+- Error format: `ErrorResponse` from this library (or RFC 9457 `ProblemDetail` for new controllers).
