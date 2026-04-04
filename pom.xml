@@ -33,6 +33,24 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- Spring Security (optional — provided by consuming services) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Spring Web / Servlet API (optional — provided by consuming services) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Spring Boot AutoConfigure (optional — for @AutoConfiguration support) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- Validation -->
         <dependency>
             <groupId>jakarta.validation</groupId>

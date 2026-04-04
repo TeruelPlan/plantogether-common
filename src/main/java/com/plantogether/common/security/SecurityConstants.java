@@ -1,6 +1,10 @@
 package com.plantogether.common.security;
 
 public final class SecurityConstants {
+    // Device identity
+    public static final String DEVICE_ID_HEADER = "X-Device-Id";
+
+    // Legacy JWT constants — kept for reference; not used by DeviceIdFilter
     public static final String CLAIM_SUB = "sub";
     public static final String CLAIM_EMAIL = "email";
     public static final String CLAIM_GIVEN_NAME = "given_name";
