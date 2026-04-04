@@ -16,7 +16,7 @@ import java.util.UUID;
 public class ExpenseCreatedEvent {
     private UUID expenseId;
     private UUID tripId;
-    private String paidByKeycloakId;
+    private String paidByDeviceId;
     private BigDecimal amount;
     private String description;
     private Instant createdAt;

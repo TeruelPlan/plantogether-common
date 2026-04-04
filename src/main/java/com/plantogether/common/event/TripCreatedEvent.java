@@ -15,6 +15,6 @@ import java.util.UUID;
 public class TripCreatedEvent implements TripEvent {
     private UUID tripId;
     private String name;
-    private String organizerKeycloakId;
+    private String organizerDeviceId;
     private Instant createdAt;
 }

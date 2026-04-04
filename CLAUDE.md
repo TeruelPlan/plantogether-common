@@ -32,27 +32,24 @@ The library is structured around four packages under `com.plantogether.common`:
 
 ### `event`
 
-RabbitMQ event DTOs for async inter-service communication. All events follow the standard envelope format with
-`eventId` (UUID v7), `eventType`, `timestamp` (Instant), `source`, `tripId`, `userId`, and a typed `payload`.
+RabbitMQ event DTOs for async inter-service communication.
 
 All classes use `UUID` for entity IDs and `Instant` for timestamps.
 
 **Implemented events:**
-- `TripCreatedEvent` — published by trip-service on `plantogether.events` exchange, routing key `trip.created`
+- `TripCreatedEvent` — published by trip-service on `plantogether.events` exchange, routing key `trip.created`. Fields: `tripId`, `name`, `organizerDeviceId`, `createdAt`.
 - `TripDeletedEvent` — published by trip-service, routing key `trip.deleted`
-- `MemberJoinedEvent` — published by trip-service, routing key `trip.member.joined`
+- `MemberJoinedEvent` — published by trip-service, routing key `trip.member.joined`. Fields: `tripId`, `deviceId`, `joinedAt`.
 - `ExpenseCreatedEvent` — published by expense-service, routing key `expense.created`
 
-**Events to implement (per DTA v2.9):**
+**Events to implement:**
 - `PollCreatedEvent` — routing key `poll.created` (poll-service)
-- `PollLockedEvent` — routing key `poll.locked` (poll-service → notification-service + trip-service)
+- `PollLockedEvent` — routing key `poll.locked` (poll-service -> notification-service + trip-service)
 - `VoteCastEvent` — routing key `vote.cast` (destination-service)
 - `ExpenseDeletedEvent` — routing key `expense.deleted` (expense-service)
 - `TaskAssignedEvent` — routing key `task.assigned` (task-service)
 - `TaskDeadlineReminderEvent` — routing key `task.deadline.reminder` (task-service scheduler)
 - `ChatMessageSentEvent` — routing key `chat.message.sent` (chat-service)
-- `UserProfileUpdatedEvent` — routing key `user.profile.updated` (keycloak-spi → trip-service)
-- `UserDeletedEvent` — routing key `user.deleted` (keycloak-spi → trip-service)
 
 All events use Exchange `plantogether.events` (Topic Exchange).
 
@@ -68,19 +65,20 @@ All events use Exchange `plantogether.events` (Topic Exchange).
 
 ### `security`
 
-`SecurityConstants` — constants for Keycloak JWT claims: `sub`, `email`, `given_name`, `family_name`,
-`preferred_username`, `realm_access.roles`.
+- `DeviceIdFilter` — `OncePerRequestFilter` that extracts the `X-Device-Id` header, validates it as a UUID, and sets the `SecurityContext` principal. This is the **only authentication mechanism** — no JWT, no tokens.
+- `SecurityAutoConfiguration` — auto-configures `SecurityFilterChain` with `DeviceIdFilter`, stateless sessions, and permitAll for actuator endpoints. Services do NOT need their own `SecurityConfig.java`.
+- `SecurityConstants` — contains `DEVICE_ID_HEADER = "X-Device-Id"` and legacy JWT claim constants (kept for reference but not used by `DeviceIdFilter`).
 
 ### `config` (to add)
 
-Per DTA v2.9, shared configuration beans to be factorised here:
+Shared configuration beans to be factorised here:
 - `CorsConfig` — CORS policy shared by all services (origins: `https://app.plantogether.com`, `http://localhost:*`)
-- Rate limiting configuration via Bucket4j + Redis (global: 100 req/min per userId)
+- Rate limiting configuration via Bucket4j + Redis (global: 100 req/min per deviceId)
 
 ## Key Conventions
 
-- User identity is always referenced by **Keycloak UUID** (field names like `organizerKeycloakId`,
-  `paidByKeycloakId`, `keycloakId`) — never by internal DB IDs.
+- User identity is always referenced by **device UUID** (field names like `organizerDeviceId`,
+  `deviceId`, `createdBy`) — never by Keycloak IDs or internal DB IDs.
 - All entity IDs are `UUID` (prefer UUID v7 for chronological ordering).
 - All timestamps are `java.time.Instant`, never `LocalDateTime`.
 - All event/DTO classes use Lombok `@Data @Builder @NoArgsConstructor @AllArgsConstructor`.

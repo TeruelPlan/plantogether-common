@@ -14,6 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MemberJoinedEvent implements TripEvent {
     private UUID tripId;
-    private String keycloakId;
+    private String deviceId;
     private Instant joinedAt;
 }
