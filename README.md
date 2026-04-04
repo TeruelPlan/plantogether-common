@@ -1,26 +1,27 @@
 # PlanTogether Common Library
 
-> Bibliothèque Maven partagée contenant les DTOs d'événements, la configuration de sécurité, le CORS et le rate limiting communs à tous les microservices
+> Shared Maven library containing event DTOs, security configuration (DeviceIdFilter), CORS, rate limiting, and exception handling — common to all microservices
 
-## Rôle
+## Role
 
-Ce module Maven regroupe tout le code partagé entre les microservices PlanTogether pour éviter la duplication :
-DTOs des événements RabbitMQ, configuration CORS commune, constantes de sécurité, et configuration du rate limiting
-(Bucket4j + Redis). Il doit être installé après `plantogether-proto` et avant tout microservice.
+This Maven module aggregates all shared code between PlanTogether microservices to avoid duplication:
+RabbitMQ event DTOs, security auto-configuration (DeviceIdFilter + SecurityFilterChain), common CORS policy,
+rate limiting (Bucket4j + Redis), and exception handling. It must be installed after `plantogether-proto`
+and before any microservice.
 
 ## Installation
 
 ```bash
-# Après plantogether-proto
+# After plantogether-proto
 cd plantogether-common
 mvn clean install
 ```
 
-## Contenu
+## Contents
 
-### DTOs des événements RabbitMQ (`event/`)
+### RabbitMQ Event DTOs (`event/`)
 
-Chaque événement suit une enveloppe standard :
+Each event follows a standard envelope:
 
 ```json
 {
@@ -29,13 +30,13 @@ Chaque événement suit une enveloppe standard :
   "timestamp": "2026-03-21T10:00:00Z",
   "source": "expense-service",
   "tripId": "uuid",
-  "userId": "keycloak-uuid",
+  "deviceId": "device-uuid",
   "payload": { ... }
 }
 ```
 
-| Classe | Routing Key | Producteur |
-|--------|-------------|------------|
+| Class | Routing Key | Producer |
+|-------|-------------|----------|
 | `TripCreatedEvent` | `trip.created` | trip-service |
 | `MemberJoinedEvent` | `trip.member.joined` | trip-service |
 | `PollCreatedEvent` | `poll.created` | poll-service |
@@ -46,47 +47,46 @@ Chaque événement suit une enveloppe standard :
 | `TaskAssignedEvent` | `task.assigned` | task-service |
 | `TaskDeadlineReminderEvent` | `task.deadline.reminder` | task-service |
 | `ChatMessageSentEvent` | `chat.message.sent` | chat-service |
-| `UserProfileUpdatedEvent` | `user.profile.updated` | keycloak-spi |
-| `UserDeletedEvent` | `user.deleted` | keycloak-spi |
 
-### Configuration de sécurité (`security/`)
+### Security (`security/`)
 
-- `KeycloakJwtConverter` : mappe `realm_access.roles` → Spring `ROLE_<ROLE>` authorities
-- Constantes : noms des rôles (`ROLE_ORGANIZER`, `ROLE_PARTICIPANT`)
-- Configuration Spring Security OAuth2 Resource Server partagée
+- `DeviceIdFilter` — `OncePerRequestFilter` that extracts the `X-Device-Id` header, validates it as a UUID, and sets the SecurityContext principal. This is the **only authentication mechanism** — no JWT, no tokens, no Keycloak.
+- `SecurityAutoConfiguration` — auto-configures `SecurityFilterChain` with `DeviceIdFilter`, stateless sessions, and permitAll for actuator endpoints. Services do NOT need their own `SecurityConfig.java`.
+- `SecurityConstants` — contains `DEVICE_ID_HEADER = "X-Device-Id"`
 
 ### CORS (`config/`)
 
-- `CorsConfig` : politique CORS commune importée par chaque service
-  - Origines : `https://app.plantogether.com`, `http://localhost:*` (dev)
-  - Méthodes : GET, POST, PUT, PATCH, DELETE, OPTIONS
-  - Headers : `Authorization`, `Content-Type`, `X-Request-ID`
+- `CorsConfig` — shared CORS policy imported by each service
+  - Origins: `https://app.plantogether.com`, `http://localhost:*` (dev)
+  - Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+  - Headers: `X-Device-Id`, `Content-Type`, `X-Request-ID`
   - `credentials: true`
 
 ### Rate Limiting (`ratelimit/`)
 
-- `RateLimitConfig` : configuration Bucket4j + Redis partagée
-- Limite globale : 100 requêtes / minute / utilisateur (extrait du JWT)
-- Les limites spécifiques par endpoint sont configurées dans chaque service
+- `RateLimitConfig` — shared Bucket4j + Redis configuration
+- Global limit: 100 requests / minute / device (extracted from `X-Device-Id` header)
+- Endpoint-specific limits are configured in each service
 
 ### Exceptions (`exception/`)
 
 - `ResourceNotFoundException` (404)
 - `ForbiddenException` (403)
 - `ConflictException` (409)
-- `ProblemDetailExceptionHandler` : formatte toutes les erreurs en `ProblemDetail` (RFC 9457)
+- `ProblemDetailExceptionHandler` — formats all errors as `ProblemDetail` (RFC 9457)
 
-## Structure du module
+## Module Structure
 
 ```
 plantogether-common/
 ├── src/main/java/com/plantogether/common/
-│   ├── event/                  # DTOs événements RabbitMQ (Java Records)
+│   ├── event/                  # RabbitMQ event DTOs (Java Records)
 │   │   ├── TripCreatedEvent.java
 │   │   ├── ExpenseCreatedEvent.java
 │   │   └── ...
 │   ├── security/
-│   │   ├── KeycloakJwtConverter.java
+│   │   ├── DeviceIdFilter.java
+│   │   ├── SecurityAutoConfiguration.java
 │   │   └── SecurityConstants.java
 │   ├── config/
 │   │   └── CorsConfig.java
@@ -99,9 +99,9 @@ plantogether-common/
 └── pom.xml
 ```
 
-## Dépendances vers ce module
+## Dependency on This Module
 
-Tous les microservices métier dépendent de `plantogether-common` :
+All business microservices depend on `plantogether-common`:
 
 ```xml
 <dependency>
