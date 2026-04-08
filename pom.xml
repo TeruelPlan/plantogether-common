@@ -88,17 +88,6 @@
         </repository>
     </distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>github-proto</id>
-            <name>GitHub Packages — proto</name>
-            <url>https://maven.pkg.github.com/TeruelPlan/plantogether-proto</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
