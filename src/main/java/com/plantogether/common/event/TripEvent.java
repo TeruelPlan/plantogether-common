@@ -8,7 +8,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = TripCreatedEvent.class, name = "TRIP_CREATED"),
         @JsonSubTypes.Type(value = TripDeletedEvent.class, name = "TRIP_DELETED"),
         @JsonSubTypes.Type(value = MemberJoinedEvent.class, name = "MEMBER_JOINED"),
-        @JsonSubTypes.Type(value = PollCreatedEvent.class, name = "poll.created"),
+        @JsonSubTypes.Type(value = PollCreatedEvent.class, name = "POLL_CREATED"),
+        @JsonSubTypes.Type(value = PollVoteCastEvent.class, name = "POLL_VOTE_CAST"),
 })
 public interface TripEvent {
 }
