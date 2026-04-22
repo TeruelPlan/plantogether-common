@@ -61,9 +61,9 @@
 
     <distributionManagement>
         <repository>
-            <id>github-common</id>
-            <name>GitHub Packages — common</name>
-            <url>https://maven.pkg.github.com/TeruelPlan/plantogether-common</url>
+            <id>github-packages</id>
+            <name>GitHub Packages — PlanTogether</name>
+            <url>https://maven.pkg.github.com/TeruelPlan/plantogether-packages</url>
         </repository>
     </distributionManagement>
 
@@ -85,9 +85,9 @@
     </build>
     <repositories>
         <repository>
-            <id>github-parent</id>
-            <name>GitHub Packages — parent</name>
-            <url>https://maven.pkg.github.com/TeruelPlan/plantogether-parent</url>
+            <id>github-packages</id>
+            <name>GitHub Packages — PlanTogether</name>
+            <url>https://maven.pkg.github.com/TeruelPlan/plantogether-packages</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
