@@ -8,7 +8,7 @@ This file provides guidance to Claude when working with code in this repository.
 dependency by all PlanTogether microservices. It contains no runnable application — only shared classes published to the
 local Maven repository.
 
-**Stack:** Java 25, Spring Boot 3.3.6 BOM (dependency management only), Lombok, Jackson (`jackson-datatype-jsr310`).
+**Stack:** Java 21, Spring Boot 3.5.9 BOM (dependency management only), Lombok, Jackson (`jackson-datatype-jsr310`).
 
 ## Commands
 
