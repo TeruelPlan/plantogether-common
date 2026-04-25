@@ -18,6 +18,13 @@
     <name>plantogether-common</name>
     <description>Shared library: RabbitMQ event DTOs, exceptions, security utilities</description>
 
+    <scm>
+        <connection>scm:git:https://github.com/TeruelPlan/plantogether-common.git</connection>
+        <developerConnection>scm:git:https://github.com/TeruelPlan/plantogether-common.git</developerConnection>
+        <url>https://github.com/TeruelPlan/plantogether-common</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
