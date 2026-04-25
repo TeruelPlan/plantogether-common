@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = PollLockedEvent.class, name = "POLL_LOCKED"),
         @JsonSubTypes.Type(value = VoteCastEvent.class, name = "VOTE_CAST"),
         @JsonSubTypes.Type(value = DestinationCommentAddedEvent.class, name = "DESTINATION_COMMENT_ADDED"),
+        @JsonSubTypes.Type(value = DestinationChosenEvent.class, name = "DESTINATION_CHOSEN"),
 })
 public interface TripEvent {
 }
