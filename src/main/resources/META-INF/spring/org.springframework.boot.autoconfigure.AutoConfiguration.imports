@@ -1,1 +1,2 @@
 com.plantogether.common.security.SecurityAutoConfiguration
+com.plantogether.common.grpc.TripClientAutoConfiguration

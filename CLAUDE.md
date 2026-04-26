@@ -69,6 +69,30 @@ All events use Exchange `plantogether.events` (Topic Exchange).
 - `SecurityAutoConfiguration` — auto-configures `SecurityFilterChain` with `DeviceIdFilter`, stateless sessions, and permitAll for actuator endpoints. Services do NOT need their own `SecurityConfig.java`.
 - `SecurityConstants` — contains `DEVICE_ID_HEADER = "X-Device-Id"` and legacy JWT claim constants (kept for reference but not used by `DeviceIdFilter`).
 
+### `grpc`
+
+Spring Boot auto-configured gRPC client for inter-service calls to `trip-service`.
+
+- `TripClient` — public interface with 4 methods: `isMember`, `requireMembership`, `getTripCurrency`, `getTripMembers`
+- `TripGrpcClient` — canonical implementation. Constructor-injected stub, 2s deadline on every call, and a single private `handleStatusRuntimeException` helper that enforces the canonical gRPC→HTTP status mapping:
+  - `UNAVAILABLE` / `DEADLINE_EXCEEDED` → `503 SERVICE_UNAVAILABLE`
+  - `INTERNAL` / `UNKNOWN` → `502 BAD_GATEWAY`
+  - `PERMISSION_DENIED` / `NOT_FOUND` (membership ops) → `AccessDeniedException` (403)
+  - `NOT_FOUND` (data ops) → `ResourceNotFoundException` (404)
+  - Anything else → `502 BAD_GATEWAY`
+- `TripClientAutoConfiguration` — `@AutoConfiguration` registered in `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`. Active only when `grpc.trip-service.host` is set. Consumers need ZERO gRPC client code — just `@Autowired TripClient tripClient`.
+- Value types: `TripMembership` (record), `TripMember` (record), `Role` (enum with `fromWire()` null-safe factory)
+
+**Test support (test-jar):** `TripClientTestSupport` provides in-process gRPC-backed factories and a builder. Consumer services import via:
+```xml
+<dependency>
+    <groupId>com.plantogether</groupId>
+    <artifactId>plantogether-common</artifactId>
+    <classifier>tests</classifier>
+    <scope>test</scope>
+</dependency>
+```
+
 ### `config` (to add)
 
 Shared configuration beans to be factorised here:
