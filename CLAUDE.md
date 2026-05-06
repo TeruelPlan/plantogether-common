@@ -41,12 +41,12 @@ All classes use `UUID` for entity IDs and `Instant` for timestamps.
 - `TripDeletedEvent` — published by trip-service, routing key `trip.deleted`
 - `MemberJoinedEvent` — published by trip-service, routing key `trip.member.joined`. Fields: `tripId`, `deviceId`, `joinedAt`.
 - `ExpenseCreatedEvent` — published by expense-service, routing key `expense.created`
+- `ExpenseDeletedEvent` — published by expense-service, routing key `expense.deleted`. Fields: `expenseId`, `tripId`, `paidByDeviceId`, `deletedByDeviceId`, `deletedAt`.
 
 **Events to implement:**
 - `PollCreatedEvent` — routing key `poll.created` (poll-service)
 - `PollLockedEvent` — routing key `poll.locked` (poll-service -> notification-service + trip-service)
 - `VoteCastEvent` — routing key `vote.cast` (destination-service)
-- `ExpenseDeletedEvent` — routing key `expense.deleted` (expense-service)
 - `TaskAssignedEvent` — routing key `task.assigned` (task-service)
 - `TaskDeadlineReminderEvent` — routing key `task.deadline.reminder` (task-service scheduler)
 - `ChatMessageSentEvent` — routing key `chat.message.sent` (chat-service)
