@@ -19,7 +19,9 @@ import java.time.Instant;
 public class VoteCastEvent implements TripEvent {
     private String tripId;
     private String destinationId;
+    // Legacy field — will be removed in Phase 3.
     private String deviceId;
+    private String tripMemberId;
     /** SIMPLE | APPROVAL | RANKING */
     private String voteMode;
     /** YES/NO for SIMPLE, score for RANKING, positional value for APPROVAL */

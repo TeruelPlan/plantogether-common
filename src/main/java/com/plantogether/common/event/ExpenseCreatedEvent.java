@@ -16,7 +16,9 @@ import java.util.UUID;
 public class ExpenseCreatedEvent {
     private UUID expenseId;
     private UUID tripId;
+    // Legacy field — will be removed in Phase 3.
     private String paidByDeviceId;
+    private String paidByMemberId;
     private BigDecimal amount;
     private String description;
     private Instant createdAt;

@@ -15,7 +15,10 @@ import java.util.UUID;
 public class ExpenseDeletedEvent {
     private UUID expenseId;
     private UUID tripId;
+    // Legacy fields — will be removed in Phase 3.
     private UUID paidByDeviceId;
     private UUID deletedByDeviceId;
+    private UUID paidByMemberId;
+    private UUID deletedByMemberId;
     private Instant deletedAt;
 }
