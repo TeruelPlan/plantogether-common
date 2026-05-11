@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -88,10 +87,9 @@ public class TripGrpcClient implements TripClient {
                             .build());
             return resp.getMembersList().stream()
                     .map(m -> new TripMember(
-                            UUID.fromString(m.getDeviceId()),
                             m.getDisplayName(),
                             Role.fromWire(m.getRole()),
-                            m.getTripMemberId().isEmpty() ? null : m.getTripMemberId()))
+                            m.getTripMemberId()))
                     .toList();
         } catch (StatusRuntimeException e) {
             throw handleStatusRuntimeException(e, Operation.GET_MEMBERS, tripId);

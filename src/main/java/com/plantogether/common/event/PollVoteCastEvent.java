@@ -15,8 +15,6 @@ public class PollVoteCastEvent implements TripEvent {
     private String pollId;
     private String tripId;
     private String slotId;
-    // Legacy field — will be removed in Phase 3.
-    private String deviceId;
     private String tripMemberId;
     private String status;
     private int newSlotScore;

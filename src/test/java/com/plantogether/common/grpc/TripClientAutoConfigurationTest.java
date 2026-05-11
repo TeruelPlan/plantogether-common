@@ -47,7 +47,7 @@ class TripClientAutoConfigurationTest {
 
         static class NoopTripClient implements TripClient {
             @Override public boolean isMember(String t, String d) { return false; }
-            @Override public TripMembership requireMembership(String t, String d) { return new TripMembership(false, Role.NONE); }
+            @Override public TripMembership requireMembership(String t, String d) { return new TripMembership(false, Role.NONE, null); }
             @Override public String getTripCurrency(String t) { return "USD"; }
             @Override public java.util.List<TripMember> getTripMembers(String t) { return java.util.List.of(); }
         }

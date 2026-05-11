@@ -21,8 +21,6 @@ public class DestinationCommentAddedEvent implements TripEvent {
   private UUID tripId;
   private UUID destinationId;
   private UUID commentId;
-  // Legacy field — will be removed in Phase 3.
-  private UUID authorDeviceId;
   private UUID authorMemberId;
   private Instant occurredAt;
 }

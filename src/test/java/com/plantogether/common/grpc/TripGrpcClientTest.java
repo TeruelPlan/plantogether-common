@@ -80,6 +80,7 @@ class TripGrpcClientTest {
 
         assertThat(membership.isMember()).isTrue();
         assertThat(membership.role()).isEqualTo(Role.ORGANIZER);
+        assertThat(membership.tripMemberId()).isNull();
     }
 
     @Test
@@ -100,10 +101,10 @@ class TripGrpcClientTest {
 
     @Test
     void getTripMembers_returnsListOfTripMembers() {
-        UUID memberUuid = UUID.randomUUID();
+        String memberId = UUID.randomUUID().toString();
         fakeService.setMembers(List.of(
                 com.plantogether.trip.grpc.TripMemberProto.newBuilder()
-                        .setDeviceId(memberUuid.toString())
+                        .setTripMemberId(memberId)
                         .setDisplayName("Alice")
                         .setRole("ORGANIZER")
                         .build()));
@@ -111,7 +112,7 @@ class TripGrpcClientTest {
         List<TripMember> members = client.getTripMembers(TRIP_ID);
 
         assertThat(members).hasSize(1);
-        assertThat(members.get(0).deviceId()).isEqualTo(memberUuid);
+        assertThat(members.get(0).tripMemberId()).isEqualTo(memberId);
         assertThat(members.get(0).displayName()).isEqualTo("Alice");
         assertThat(members.get(0).role()).isEqualTo(Role.ORGANIZER);
     }

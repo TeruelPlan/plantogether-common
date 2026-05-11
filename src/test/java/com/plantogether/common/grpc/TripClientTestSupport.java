@@ -18,7 +18,7 @@ import java.util.List;
  * try (var client = TripClientTestSupport.builder()
  *         .member(TRIP_ID, DEVICE_ID)
  *         .withCurrency(TRIP_ID, "EUR")
- *         .withMembers(TRIP_ID, List.of(new TripMember(uuid, "Alice", Role.ORGANIZER)))
+ *         .withMembers(TRIP_ID, List.of(new TripMember("Alice", Role.ORGANIZER, memberIdString)))
  *         .build()) {
  *     // test code
  * }
