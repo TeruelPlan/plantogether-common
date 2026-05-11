@@ -17,7 +17,7 @@
     <description>Shared library: RabbitMQ event DTOs, exceptions, security utilities</description>
 
     <properties>
-        <plantogether-proto.version>2.0.0-SNAPSHOT</plantogether-proto.version>
+        <plantogether-proto.version>2.0.0</plantogether-proto.version>
     </properties>
 
     <scm>
