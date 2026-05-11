@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -111,11 +110,13 @@ public class InProcessTripClient implements TripClient, AutoCloseable {
         void setMembers(String tripId, List<TripMember> memberList) {
             List<TripMemberProto> protos = new ArrayList<>();
             for (TripMember m : memberList) {
-                protos.add(TripMemberProto.newBuilder()
-                        .setDeviceId(m.deviceId().toString())
+                TripMemberProto.Builder b = TripMemberProto.newBuilder()
                         .setDisplayName(m.displayName())
-                        .setRole(m.role().name())
-                        .build());
+                        .setRole(m.role().name());
+                if (m.tripMemberId() != null) {
+                    b.setTripMemberId(m.tripMemberId());
+                }
+                protos.add(b.build());
             }
             members.put(tripId, protos);
         }

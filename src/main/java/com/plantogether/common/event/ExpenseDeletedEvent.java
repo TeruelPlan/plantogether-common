@@ -15,7 +15,7 @@ import java.util.UUID;
 public class ExpenseDeletedEvent {
     private UUID expenseId;
     private UUID tripId;
-    private UUID paidByDeviceId;
-    private UUID deletedByDeviceId;
+    private UUID paidByMemberId;
+    private UUID deletedByMemberId;
     private Instant deletedAt;
 }

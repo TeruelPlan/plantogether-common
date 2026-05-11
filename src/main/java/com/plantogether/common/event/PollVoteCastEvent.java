@@ -15,7 +15,7 @@ public class PollVoteCastEvent implements TripEvent {
     private String pollId;
     private String tripId;
     private String slotId;
-    private String deviceId;
+    private String tripMemberId;
     private String status;
     private int newSlotScore;
     private Instant occurredAt;

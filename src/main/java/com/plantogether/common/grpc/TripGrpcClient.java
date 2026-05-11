@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,7 +57,9 @@ public class TripGrpcClient implements TripClient {
             if (!resp.getIsMember()) {
                 throw new AccessDeniedException("Unable to verify trip membership");
             }
-            return new TripMembership(true, Role.fromWire(resp.getRole()));
+            String memberId = resp.getTripMemberId();
+            return new TripMembership(true, Role.fromWire(resp.getRole()),
+                    memberId.isEmpty() ? null : memberId);
         } catch (StatusRuntimeException e) {
             throw handleStatusRuntimeException(e, Operation.REQUIRE_MEMBERSHIP, tripId);
         }
@@ -86,9 +87,9 @@ public class TripGrpcClient implements TripClient {
                             .build());
             return resp.getMembersList().stream()
                     .map(m -> new TripMember(
-                            UUID.fromString(m.getDeviceId()),
                             m.getDisplayName(),
-                            Role.fromWire(m.getRole())))
+                            Role.fromWire(m.getRole()),
+                            m.getTripMemberId()))
                     .toList();
         } catch (StatusRuntimeException e) {
             throw handleStatusRuntimeException(e, Operation.GET_MEMBERS, tripId);

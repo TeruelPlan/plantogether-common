@@ -1,3 +1,3 @@
 package com.plantogether.common.grpc;
 
-public record TripMembership(boolean isMember, Role role) {}
+public record TripMembership(boolean isMember, Role role, String tripMemberId) {}

@@ -21,6 +21,6 @@ public class DestinationCommentAddedEvent implements TripEvent {
   private UUID tripId;
   private UUID destinationId;
   private UUID commentId;
-  private UUID authorDeviceId;
+  private UUID authorMemberId;
   private Instant occurredAt;
 }
